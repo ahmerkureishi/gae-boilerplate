@@ -25,15 +25,18 @@ def lang(mode="extract"):
         local("pybabel compile -f -d ./locale")
     else:
         local("pybabel extract -F ./locale/babel.cfg -o ./locale/messages.pot ./ --sort-output --no-location --omit-header")
+        local("pybabel update -l cs_CZ -d ./locale -i ./locale/messages.pot --previous --ignore-obsolete")
+        local("pybabel update -l de_DE -d ./locale -i ./locale/messages.pot --previous --ignore-obsolete")
         local("pybabel update -l en_US -d ./locale -i ./locale/messages.pot --previous --ignore-obsolete")
         local("pybabel update -l es_ES -d ./locale -i ./locale/messages.pot --previous --ignore-obsolete")
-        local("pybabel update -l it_IT -d ./locale -i ./locale/messages.pot --previous --ignore-obsolete")
-        local("pybabel update -l zh_CN -d ./locale -i ./locale/messages.pot --previous --ignore-obsolete")
-        local("pybabel update -l id_ID -d ./locale -i ./locale/messages.pot --previous --ignore-obsolete")
         local("pybabel update -l fr_FR -d ./locale -i ./locale/messages.pot --previous --ignore-obsolete")
-        local("pybabel update -l de_DE -d ./locale -i ./locale/messages.pot --previous --ignore-obsolete")
-        local("pybabel update -l ru_RU -d ./locale -i ./locale/messages.pot --previous --ignore-obsolete")
+        local("pybabel update -l id_ID -d ./locale -i ./locale/messages.pot --previous --ignore-obsolete")
+        local("pybabel update -l it_IT -d ./locale -i ./locale/messages.pot --previous --ignore-obsolete")
+        local("pybabel update -l nl_NL -d ./locale -i ./locale/messages.pot --previous --ignore-obsolete")
         local("pybabel update -l pt_BR -d ./locale -i ./locale/messages.pot --previous --ignore-obsolete")
+        local("pybabel update -l ru_RU -d ./locale -i ./locale/messages.pot --previous --ignore-obsolete")
+        local("pybabel update -l vi_VN -d ./locale -i ./locale/messages.pot --previous --ignore-obsolete")
+        local("pybabel update -l zh_CN -d ./locale -i ./locale/messages.pot --previous --ignore-obsolete")
 
 def start(mode="normal"):
     """
@@ -44,25 +47,18 @@ def start(mode="normal"):
 
     """
 
-    if mode == "clear":
-        local("dev_appserver.py . -p 8080 -a 0.0.0.0 --clear_datastore")
+    if mode == "clear" or mode == "clean":
+        local("dev_appserver.py ./ --host 0.0.0.0 --port 8002 --clear_datastore=yes")
     else:
-        local("dev_appserver.py . -p 8080 -a 0.0.0.0")
+        local("dev_appserver.py ./ --host 0.0.0.0 --port 8002")
 
-def deploy(app_id="sandengine", version="2-2"):
+def deploy():
     """
         app.yaml never has to be version:default
 
-        HOW TO RUN:
-
-            option 1) fab deploy
-            option 2) fab deploy:preview
-            option 3) fab deploy:prod
-            option 4) fab deploy:homo
-
     """
 
-    local("appcfg.py --no_cookies --oauth2 -A {0} -V {1} update .".format(app_id, version))
+    local("appcfg.py --oauth2 update .")
 
 def test(os="mac"):
     """
@@ -83,4 +79,4 @@ def test(os="mac"):
         "mac": "/usr/local/google_appengine",
        }[os]
 
-    local("python testrunner.py {0} ./".format(path))
+    local("theme=default python testrunner.py {0} ./".format(path))
